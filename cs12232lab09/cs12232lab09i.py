@@ -12,6 +12,3 @@ def min_boxes_solver(s: Sequence[int], t: int) -> int:
 
 def min_boxes(s: Sequence[int], t: int) -> int:
     return min_boxes_solver(insertion_sort(s), t)
-
-assert min_boxes((5, 7, 2, 3), 8) == 3
-assert min_boxes((5, 7, 2, 3), 80) == 2
