@@ -174,24 +174,6 @@ class PipeGame(pg.PyxelGrid[CellState]):
     def post_draw_grid(self) -> None:
         if self.completed:
             pyxel.text(pyxel.width//2 - 10, pyxel.height//2, 'You Win!', 14)
-            if pyxel.btnp(pyxel.KEY_R):
-                self.completed = False
-                parser = ArgumentParser(description=f"Run the '{TITLE}' game.")
-
-                parser.add_argument('-d', '--difficulty', default='easy',
-                    help=f"the game difficulty. must be one of: {', '.join(pl.DIFFICULTY_SETTINGS.keys())} (default: %(default)s)")
-                parser.add_argument('-s', '--seed', type=int, default=None,
-                    help="the seed for the random number generator. (default: based on system time)")
-
-                args = parser.parse_args()
-
-                if (seed := args.seed) is None:
-                    seed = getrandbits(31)
-
-                if args.difficulty not in pl.DIFFICULTY_SETTINGS:
-                    raise ValueError(f"Unknown difficulty: {args.difficulty}")
-
-                self.__init__(settings=pl.DIFFICULTY_SETTINGS[args.difficulty], seed=seed)
 
         if pyxel.btnp(pyxel.KEY_Q):
             self.completed = False

@@ -7,11 +7,12 @@ def insert(elem: int, sorted_elems: Sequence[int]) -> list[int]:
 def insertion_sort(elems: Sequence[int]) -> list[int]:
     return list(elems) if len(elems) <= 1 else insert(elems[0], insertion_sort(elems[1:]))
 
+
 def min_boxes_solver(s: Sequence[int], t: int) -> int:
     return 0 if not s else (1 + min_boxes_solver(s[1:-1], t) if s[0] + s[-1] <= t else 1 + min_boxes_solver(s[:-1], t))
 
 def min_boxes(s: Sequence[int], t: int) -> int:
     return min_boxes_solver(insertion_sort(s), t)
 
-assert min_boxes((5, 7, 2, 3), 8) == 3
-assert min_boxes((5, 7, 2, 3), 80) == 2
+assert min_boxes([3,5,3,4], 5) == 4
+assert min_boxes([3,2,2,1], 3) == 3
