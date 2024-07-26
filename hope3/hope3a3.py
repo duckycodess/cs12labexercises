@@ -1,28 +1,57 @@
-from __future__ import annotations
-
-from dataclasses import dataclass
-from typing import Literal
-from typing import Sequence
+from typing import Sequence, Literal
+from functools import lru_cache
 
 RPSMove = Literal['rock', 'paper', 'scissors']
 
-@dataclass(frozen=True)
-class Match:
-    left:  Match | RPSMove
-    right: Match | RPSMove
-
-def get_winning_move(tournament: Match | RPSMove) -> RPSMove:
-    return tournament if isinstance(tournament, str) else (
-            get_winning_move(tournament.left) if (
-                (get_winning_move(tournament.left) == 'rock' and get_winning_move(tournament.right) == 'scissors') or 
-                (get_winning_move(tournament.left) == 'scissors' and get_winning_move(tournament.right) == 'paper') or 
-                (get_winning_move(tournament.left) == 'paper' and get_winning_move(tournament.right) == 'rock') or 
-                (get_winning_move(tournament.left) == get_winning_move(tournament.right))) else get_winning_move(tournament.right))
-       
-def make_single_elimination_tournament(names: Sequence[RPSMove]) -> Match | RPSMove:
-    return names[0] if len(names) == 1 else Match(
-        left=make_single_elimination_tournament(names[:(len(names) + 1) // 2]),
-        right=make_single_elimination_tournament(names[(len(names) + 1) // 2:]))
-
 def get_winning_moves(player_moves: Sequence[RPSMove], m: int) -> list[RPSMove]:
-    return [get_winning_move(make_single_elimination_tournament(player_moves[i:i + m])) for i in range(len(player_moves) - m + 1)]
+    n = len(player_moves)
+    
+    def decide_winner(move1: RPSMove, move2: RPSMove) -> RPSMove:
+        if move1 == move2:
+            return move1
+        elif (move1, move2) in [('rock', 'scissors'), ('scissors', 'paper'), ('paper', 'rock')]:
+            return move1
+        else:
+            return move2
+    
+    @lru_cache(None)
+    def tournament_winner(start: int, end: int) -> RPSMove:
+        if start == end:
+            return player_moves[start]
+        mid = (start + end) // 2
+        left_winner = tournament_winner(start, mid)
+        right_winner = tournament_winner(mid + 1, end)
+        return decide_winner(left_winner, right_winner)
+    
+    results: list[RPSMove] = []
+    for i in range(n - m + 1):
+        results.append(tournament_winner(i, i + m - 1))
+    
+    return results
+
+
+
+
+def test_get_winning_moves():
+    assert get_winning_moves((
+        'rock',
+        'scissors',
+        'rock',
+        'paper',
+        'scissors',
+    ), 3) == [
+        'rock',
+        'paper',
+        'scissors',
+    ]
+
+    # Additional tests can be added here
+
+# Example test run
+print(get_winning_moves((
+        'rock',
+        'scissors',
+        'rock',
+        'paper',
+        'scissors',
+    ), 5))

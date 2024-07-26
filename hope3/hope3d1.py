@@ -16,3 +16,4 @@ def repdigits_at_most(n: int) -> list[int]:
             mult = mult * 10 + 1
 
     return sorted(rep)
+print(repdigits_at_most(50000))
