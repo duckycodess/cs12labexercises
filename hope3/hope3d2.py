@@ -1,33 +1,18 @@
-from collections import defaultdict
+from functools import lru_cache
 
-def repdigits_at_most(n: int) -> list[int]:
-    rep: list[int] = []
-    for i in range(1, 10):
-        if i > n:
-            break
-        rep.append(i)
+@lru_cache(maxsize=None)
+def count_repdigit_decompositions(n: int) -> int:
+    repdigits = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 22, 33, 44, 55, 66, 77, 88, 99, 111, 222, 333, 444, 555, 666, 777, 888, 999, 
+           1111, 2222, 3333, 4444, 5555, 6666, 7777, 8888, 9999, 11111, 22222, 33333, 44444, 55555, 66666, 77777]
     
-        mult = 11
-        while True:
-            repdigit = i * mult
-            if repdigit > n:
-                break
-            rep.append(repdigit)
-            mult = mult * 10 + 1
-
-    return sorted(rep)
-
-def repdigit_decompose(n: int) -> list[int]:
-    repdigits = repdigits_at_most(n)
-    dp = [float('inf')] * (n + 1)
-    dp[0] = 0
-    solution: dict[int, list[int]] = defaultdict(list)
-
-    for rep in repdigits:
-        for i in range(rep, n + 1):
-            if dp[i - rep] + 1 < dp[i]:
-                dp[i] = dp[i - rep] + 1
-                solution[i] = solution[i - rep] + [rep]
-
-    return solution[n]
-
+    if n == 0:
+        return 1
+    result = 0
+    for num in repdigits:
+        if n-num >= 0:
+            result += count_repdigit_decompositions(n-num)
+        else:
+            break
+    return result
+for i in range(498, 80001, 498):
+    print(count_repdigit_decompositions(i))
